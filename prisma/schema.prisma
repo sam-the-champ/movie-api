@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+// users -- movies -- watchlist
+
+model User {
+  id  String @id @default(uuid()) // we are defining the user data we are saying that it has one column called id, it is a String
+  //and the @id we are letting prisma know that this is the id of the table. and the uuid function is to, whenever a new user is created,
+  //to generate a new uuid for this user
+  //uuid is just a standard of IDS that is used in APIs and in different database tables. it is going to generate a random id for this user,
+  //and it is most likely going to be completely unique for each user
+
+  name String
+  email String @unique // the unique  property helps us to not have two users with same email
+  password String
+
+
+  createdAt DateTime @default(now()) // it will always default to now so that when we create a user it will automatically save the createdAt
+  //field to be the current time
+
+  //relationship
+
+  movies Movie[] @relation("MovieCreator") //this is a relationship between the user and the movie. we are saying that a user can have many movies
+  watchlist WatchlistItem[] //this is a relationship between the user and the watchlist
+
+}
+
+//nb: @default(...) tells Prisma what value to use automatically when you create a new record and don't provide one yourself.
+
+model Movie{
+  id            String  @id @default(uuid())
+  title         String
+  overview      String?  //the question mark makes it optional
+  releaseYear   Int
+  genres        String[] @default([])  //array of strings @default([]) it will automatically default to an empty array
+  posterUrl     String?
+  createdBy     String
+  createdAt     DateTime @default(now())
+
+  //relationship
+  creator User @relation( "MovieCreator", fields: [createdBy], references: [id], onDelete: Cascade) //this is a relationship between 
+  //the movie and the user.
+  // we are saying that
+  //the createdBy field in the movie table is a foreign key that references the id field in the user table.
+  // and we are saying that if the user is deleted, then the movie should also be deleted. this is called cascading delete. 
+  //so if a user is deleted, all the movies created by that user will also be deleted. this is to maintain referential integrity. 
+  watchlistItems WatchlistItem[] //this is a relationship between the movie and the watchlist. we are saying that a movie can have many watchlist items
+  
+}
+
+model WatchlistItem{
+  id        String @id @default(uuid())
+  userId    String
+  movieId   String
+  status    watchlistStatus @default(PLANNED) //
+  rating    Int?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  //relationship
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+}
+
+//the watchlistStatus is a custom type a enum
+
+enum watchlistStatus{
+  PLANNED
+  WATCHING
+  COMPLETED
+  DROPPED
+}
