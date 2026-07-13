@@ -2,14 +2,21 @@ import express from "express";
 import movieRoute from "./routes/movieRoutes.js";
 import dotenv from "dotenv";
 import { connectDB, disconnectDB } from "./config/db.js";
+import authRoute from "./routes/authRoutes.js"
 
 dotenv.config();
 
 connectDB(); //connect to the database
 
 const app = express();
+//body parsing middleware
+app.use(express.json());  // using a middleware that comes with express that is called express.json. it handles every json sent as
+//a body of any req
+app.use(express.urlencoded({ extended: true }));//this says to express to automatically parse data from an HTML form submission
+//so that you can access it in the req.body
 
 app.use("/api/movies", movieRoute);
+app.use("/api/auth", authRoute);
 
 const PORT = 5001;
 
@@ -105,5 +112,16 @@ process.on("uncaughtException", (err) => {
 //the user. it is so that we have the types inscribed in. what we need to do is generate our types after making those changes.
 //so on top of making this migration, anytime we make a change in our tables, we also need to run npx prisma generate
 // to generate the types for the tables we created in the schema.prisma file. so we can easily use them in our code.
-//we have created all our models, now we can start creating our routes and controllers for our models. 
-// so we can create a routes folder and in it a movieRoutes.js file
+//we have created all our models, now we can start creating our routes and controllers for our models.
+// so we can create a routes folder
+//i alredy have i movieRoute file in it but i am going to now create my auth route
+//it is recomended that for each route, i create a controller that will run the actual thing when my empoint is hit
+//so i am creating a folder, controllers, and i will create auth controller.js
+//so for each route we are going to create a corresponding function which will be in the controllers folder
+//something to note: node js and express servers, do not know how to naturally handle json by default so in our server we add
+//above the api i am going to add the body parsing middlware:added it already
+//install bycrptjs for hashig of the password
+//install jwt and then create the helper function for generating jwt in another folder called utils
+// and utils folder is basically for any kind of helper file that contains a function that we want to reuse through out our api
+// so in it for jwt i created a generateToken.js file
+//so for prisma 7 i had to dowload an adapter then i edited the db,js to import and use it
