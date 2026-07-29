@@ -125,3 +125,7 @@ process.on("uncaughtException", (err) => {
 // and utils folder is basically for any kind of helper file that contains a function that we want to reuse through out our api
 // so in it for jwt i created a generateToken.js file
 //so for prisma 7 i had to dowload an adapter then i edited the db,js to import and use it
+//creating a seed file, to add data to the database, mock data(not real data). so i will create a seed file
+//a seed file is a file that contains a function that all it deos is it adds data to the db, mock data so we can test while building
+//so now i will create my seed file in the prisma folder 
+// and then i will add a script in the package.json file to run the seed file
